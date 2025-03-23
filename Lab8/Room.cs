@@ -1,38 +1,19 @@
-﻿using HotelBooking;
+﻿using HotelBookingSystem;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-/// <summary>
-/// Перерахування, що описує можливі типи кімнат.
-/// </summary>
-public enum RoomType
-{
-    Single,
-    Double,
-    Suite
-}
-
-/// <summary>
-/// Клас, що описує кімнату в готелі.
-/// Демонструє композицію (кімната існує в межах готелю).
-/// </summary>
 public class Room
 {
-    /// <summary>
-    /// Номер кімнати (у сенсі "№12").
-    /// </summary>
-    public int RoomNumber { get; set; }
-
-    /// <summary>
-    /// Тип кімнати (Single, Double, Suite).
-    /// </summary>
-    public RoomType Type { get; set; }
-
-    /// <summary>
-    /// Ціна за добу.
-    /// </summary>
-    public decimal PricePerDay { get; set; }
-
-    /// <summary>
-    /// Прапорець, чи зайнята кімната.
-    /// </summary>
+    public int Number { get; }
     public bool IsBooked { get; set; }
+    public decimal PricePerDay { get; }
+
+    public Room(int number, decimal pricePerDay)
+    {
+        Number = number;
+        PricePerDay = pricePerDay;
+    }
 }
