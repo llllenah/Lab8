@@ -1,107 +1,166 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-class Program
+﻿public class Program
 {
-    static void Main()
+    public static void Main()
     {
-        Console.WriteLine("Hotel Booking System Initialized");
-
         IHotelManager manager = new HotelManager();
 
-        TryExecute(() => manager.AddHotel("Grand Hotel", "Kyiv", "Main Street", 50));
-        TryExecute(() => manager.AddHotel("Ocean View", "Odesa", "Beach Avenue", 30));
-        TryExecute(() => manager.AddHotel("Luxury Stay", "Lviv", "Central Street", 100));
+        Console.WriteLine("=== HOTEL MANAGEMENT ===");
 
-        TryExecute(() => manager.AddClient("John", "Doe"));
-        TryExecute(() => manager.AddClient("Alice", "Smith"));
-        TryExecute(() => manager.AddClient("Anna", "Ledecky"));
-        TryExecute(() => manager.AddClient("Bob", "Johnson"));
+        manager.AddHotel("Grand Hotel", "Kyiv", "Main Street", 50);
+        manager.AddHotel("Ocean View", "Odesa", "Beach Avenue", 30);
+        manager.AddHotel("Mountain Inn", "Lviv", "Hill Road", 20);
 
-        TryExecute(() => manager.AddBooking("John", "Doe", "Grand Hotel", 101, DateTime.Now, DateTime.Now.AddDays(3), 100));
-        TryExecute(() => manager.AddBooking("Alice", "Smith", "Ocean View", 102, DateTime.Now, DateTime.Now.AddDays(2), 150));
-        TryExecute(() => manager.AddBooking("Anna", "Ledecky", "Luxury Stay", 201, DateTime.Now, DateTime.Now.AddDays(5), 200));
+        var hotel1 = manager.GetHotel("Grand Hotel");
+        Console.WriteLine($"\nHotel Details: {hotel1.Name} in {hotel1.Address.City} with {hotel1.TotalRooms} rooms.");
 
-        Console.WriteLine("--- All Hotels ---");
-        foreach (var hotel in manager.GetHotels())
+        Console.WriteLine("\nAll Hotels:");
+        foreach (var h in manager.GetHotels())
         {
-            Console.WriteLine($"{hotel.Name} - Rooms: {hotel.TotalRooms}, Location: {hotel.Address.City}, {hotel.Address.Street}");
+            Console.WriteLine($"- {h.Name}: City = {h.Address.City}, Total Rooms = {h.TotalRooms}");
         }
 
-        Console.WriteLine("--- All Clients ---");
-        foreach (var client in manager.GetClients())
+        Console.WriteLine("\nRemoving 'Ocean View' hotel...");
+        manager.RemoveHotel("Ocean View");
+
+        Console.WriteLine("Hotels after removal:");
+        foreach (var h in manager.GetHotels())
         {
-            Console.WriteLine($"{client.FirstName} {client.LastName}");
+            Console.WriteLine($"- {h.Name}");
         }
 
-        Console.WriteLine("--- All Bookings ---");
-        foreach (var booking in manager.GetBookings())
+        Console.WriteLine("\n=== CLIENT MANAGEMENT ===");
+
+        manager.AddClient("John", "Doe");
+        manager.AddClient("Alice", "Smith");
+        manager.AddClient("Bob", "Brown");
+
+        var clientJohn = manager.GetClient("John", "Doe");
+        Console.WriteLine($"\nClient Details: {clientJohn.FirstName} {clientJohn.LastName}");
+
+        Console.WriteLine("\nUpdating 'John Doe' to 'Johnny Doe'...");
+        manager.UpdateClient("John", "Doe", "Johnny", "Doe");
+
+        var updatedClient = manager.GetClient("Johnny", "Doe");
+        Console.WriteLine($"Updated Client: {updatedClient.FirstName} {updatedClient.LastName}");
+
+        Console.WriteLine("\nAll Clients:");
+        foreach (var c in manager.GetClients())
         {
-            Console.WriteLine($"{booking.Client.FirstName} {booking.Client.LastName} - {booking.Hotel.Name}, Room {booking.Room.Number}, {booking.StartDate.ToShortDateString()} to {booking.EndDate.ToShortDateString()}");
+            Console.WriteLine($"- {c.FirstName} {c.LastName}");
         }
 
-        Console.WriteLine("\n--- Search for Hotels (Keyword: 'Grand') ---");
-        var searchHotels = manager.SearchHotels("Grand");
-        foreach (var hotel in searchHotels)
+        Console.WriteLine("\nClients Sorted by First Name:");
+        foreach (var c in manager.GetClientsSortedByName())
         {
-            Console.WriteLine($"{hotel.Name}");
+            Console.WriteLine($"- {c.FirstName} {c.LastName}");
         }
 
-        Console.WriteLine("\n--- Search for Clients (Keyword: 'Doe') ---");
-        var searchClients = manager.SearchClients("Doe");
-        foreach (var client in searchClients)
+        Console.WriteLine("\nClients Sorted by Last Name:");
+        foreach (var c in manager.GetClientsSortedByLastName())
         {
-            Console.WriteLine($"{client.FirstName} {client.LastName}");
+            Console.WriteLine($"- {c.FirstName} {c.LastName}");
         }
 
-        TryExecute(() => manager.RemoveBooking("John", "Doe", "Grand Hotel", 101));
+        Console.WriteLine("\nRemoving 'Alice Smith'...");
+        manager.RemoveClient("Alice", "Smith");
 
-        Console.WriteLine("\n--- All Bookings after removing John Doe's booking ---");
-        foreach (var booking in manager.GetBookings())
+        Console.WriteLine("Clients after removal:");
+        foreach (var c in manager.GetClients())
         {
-            Console.WriteLine($"{booking.Client.FirstName} {booking.Client.LastName} - {booking.Hotel.Name}, Room {booking.Room.Number}");
+            Console.WriteLine($"- {c.FirstName} {c.LastName}");
         }
 
-        TryExecute(() => manager.RemoveHotel("Ocean View"));
-        TryExecute(() => manager.RemoveClient("Alice", "Smith"));
+        Console.WriteLine("\n=== BOOKING MANAGEMENT ===");
 
-        Console.WriteLine("\n--- All Hotels after removing 'Ocean View' ---");
-        foreach (var hotel in manager.GetHotels())
+        manager.AddBooking("Johnny", "Doe", "Grand Hotel", 1, DateTime.Now, DateTime.Now.AddDays(3), 100, "Late check-in");
+        manager.AddBooking("Bob", "Brown", "Mountain Inn", 5, DateTime.Now.AddDays(1), DateTime.Now.AddDays(3), 80, "Near window");
+
+        var booking1 = manager.GetBooking("Johnny", "Doe", "Grand Hotel", 1);
+        Console.WriteLine($"\nBooking Details: {booking1.Client.FirstName} booked Room {booking1.Room.Number} at {booking1.Hotel.Name}");
+
+        Console.WriteLine("\nBooked Rooms in Grand Hotel:");
+        foreach (var room in manager.GetBookedRooms("Grand Hotel"))
         {
-            Console.WriteLine($"{hotel.Name}");
+            Console.WriteLine($"- Room {room.Number}");
         }
 
-        Console.WriteLine("\n--- All Clients after removing 'Alice Smith' ---");
-        foreach (var client in manager.GetClients())
+        Console.WriteLine("\nAvailable Rooms in Grand Hotel:");
+        foreach (var room in manager.GetAvailableRooms("Grand Hotel"))
         {
-            Console.WriteLine($"{client.FirstName} {client.LastName}");
+            Console.WriteLine($"- Room {room.Number}");
         }
 
-        TryExecute(() => manager.AddHotel("Ocean View", "Odesa", "Beach Avenue", 30));
-        TryExecute(() => manager.AddClient("Alice", "Smith"));
+        decimal costJohnny = manager.GetBookingCost("Johnny", "Doe", "Grand Hotel", 1);
+        Console.WriteLine($"\nBooking Cost for Johnny Doe in Grand Hotel, Room 1: {costJohnny}");
 
-        Console.WriteLine("\n--- All Hotels after adding 'Ocean View' back ---");
-        foreach (var hotel in manager.GetHotels())
+        Console.WriteLine("\nClients with Bookings:");
+        foreach (var c in manager.GetClientsWithBookings())
         {
-            Console.WriteLine($"{hotel.Name}");
+            Console.WriteLine($"- {c.FirstName} {c.LastName}");
         }
 
-        Console.WriteLine("\n--- All Clients after adding 'Alice Smith' back ---");
-        foreach (var client in manager.GetClients())
-        {
-            Console.WriteLine($"{client.FirstName} {client.LastName}");
-        }
-    }
+        Console.WriteLine("\nCancelling Bob Brown's booking in Mountain Inn (Room 5)...");
+        manager.RemoveBooking("Bob", "Brown", "Mountain Inn", 5);
 
-    static void TryExecute(Action action)
-    {
-        try
+        Console.WriteLine("Booked Rooms in Mountain Inn after cancellation:");
+        foreach (var room in manager.GetBookedRooms("Mountain Inn"))
         {
-            action();
+            Console.WriteLine($"- Room {room.Number}");
         }
-        catch (Exception ex)
+
+        Console.WriteLine("\nAll Bookings:");
+        foreach (var b in manager.GetBookings())
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"- {b.Client.FirstName} {b.Client.LastName} booked {b.Hotel.Name} Room {b.Room.Number} from {b.StartDate.ToShortDateString()} to {b.EndDate.ToShortDateString()}");
+        }
+
+        Console.WriteLine("\nBookings within the next 5 days:");
+        foreach (var b in manager.GetBookingsByDateRange(DateTime.Now, DateTime.Now.AddDays(5)))
+        {
+            Console.WriteLine($"- {b.Client.FirstName} {b.Client.LastName} in {b.Hotel.Name} Room {b.Room.Number}");
+        }
+
+        Console.WriteLine("\n=== BOOKING REQUEST MANAGEMENT ===");
+
+        manager.AddBookingRequest("Grand Hotel", 2, "Need a quiet room", DateTime.Now, DateTime.Now.AddDays(2));
+        manager.AddBookingRequest("Mountain Inn", 10, "High floor requested", DateTime.Now.AddDays(1), DateTime.Now.AddDays(4));
+
+        Console.WriteLine("\nBooking Requests (within next 5 days):");
+        foreach (var br in manager.GetBookingRequests(DateTime.Now, DateTime.Now.AddDays(5)))
+        {
+            Console.WriteLine($"- {br.HotelName} Room {br.RoomNumber}: {br.RequestText} (from {br.StartDate.ToShortDateString()} to {br.EndDate.ToShortDateString()})");
+        }
+
+        Console.WriteLine("\nUpdating booking request for Grand Hotel Room 2...");
+        manager.UpdateBookingRequest("Grand Hotel", 2, "Need a quiet room with extra pillows");
+
+        Console.WriteLine("Booking Requests after update:");
+        foreach (var br in manager.GetBookingRequests(DateTime.Now, DateTime.Now.AddDays(5)))
+        {
+            Console.WriteLine($"- {br.HotelName} Room {br.RoomNumber}: {br.RequestText}");
+        }
+
+        Console.WriteLine("\nRemoving booking request for Mountain Inn Room 10...");
+        manager.RemoveBookingRequest("Mountain Inn", 10);
+
+        Console.WriteLine("Booking Requests after removal:");
+        foreach (var br in manager.GetBookingRequests(DateTime.Now, DateTime.Now.AddDays(5)))
+        {
+            Console.WriteLine($"- {br.HotelName} Room {br.RoomNumber}: {br.RequestText}");
+        }
+
+        Console.WriteLine("\n=== SEARCH FUNCTIONALITY ===");
+
+        Console.WriteLine("\nSearching for hotels with keyword 'Inn':");
+        foreach (var h in manager.SearchHotels("Inn"))
+        {
+            Console.WriteLine($"- {h.Name}");
+        }
+
+        Console.WriteLine("\nSearching for clients with keyword 'Doe':");
+        foreach (var c in manager.SearchClients("Doe"))
+        {
+            Console.WriteLine($"- {c.FirstName} {c.LastName}");
         }
     }
 }

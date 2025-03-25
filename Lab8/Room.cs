@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public class Room
 {
-    public int Number { get; }
+    public int Number { get; set; }
     public bool IsBooked { get; set; }
 
     public Room(int number)
