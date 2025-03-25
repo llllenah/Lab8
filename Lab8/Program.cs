@@ -78,6 +78,25 @@
         var booking1 = manager.GetBooking("Johnny", "Doe", "Grand Hotel", 1);
         Console.WriteLine($"\nBooking Details: {booking1.Client.FirstName} booked Room {booking1.Room.Number} at {booking1.Hotel.Name}");
 
+        var booking = manager.GetBooking("Johnny", "Doe", "Grand Hotel", 1);
+        if (booking != null)
+        {
+            decimal totalCost = manager.GetBookingCost("Johnny", "Doe", "Grand Hotel", 1);
+            decimal pricePerNight = booking.PricePerNight;
+
+            Console.WriteLine($"\nBooking Details for {booking.Client.FirstName} {booking.Client.LastName}:");
+            Console.WriteLine($"Hotel: {booking.Hotel.Name}");
+            Console.WriteLine($"Room: {booking.Room.Number}");
+            Console.WriteLine($"Stay: {booking.StartDate.ToShortDateString()} to {booking.EndDate.ToShortDateString()}");
+            Console.WriteLine($"Price per Night: {pricePerNight}");
+            Console.WriteLine($"Total Booking Cost: {totalCost}");
+        }
+        else
+        {
+            Console.WriteLine("Booking not found.");
+        }
+
+
         Console.WriteLine("\nBooked Rooms in Grand Hotel:");
         foreach (var room in manager.GetBookedRooms("Grand Hotel"))
         {
