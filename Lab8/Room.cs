@@ -1,5 +1,4 @@
-﻿using HotelBookingSystem;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +8,11 @@ public class Room
 {
     public int Number { get; }
     public bool IsBooked { get; set; }
-    public decimal PricePerDay { get; }
 
-    public Room(int number, decimal pricePerDay)
+    public Room(int number)
     {
         Number = number;
-        PricePerDay = pricePerDay;
+        IsBooked = false;
     }
 }
+
