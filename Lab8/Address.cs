@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-public class Address
+﻿public class Address
 {
+    /// <summary>
+    /// Місто.
+    /// </summary>
     public string City { get; set; }
+    /// <summary>
+    /// Вулиця.
+    /// </summary>
     public string Street { get; set; }
 
+    /// <summary>
+    /// Конструктор адреси.
+    /// </summary>
     public Address(string city, string street)
     {
         City = city;
