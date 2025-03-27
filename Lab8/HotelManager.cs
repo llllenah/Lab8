@@ -99,14 +99,14 @@ public class HotelManager : IHotelManager
 
     public void AddBooking(string clientFirstName, string clientLastName, string hotelName, int roomNumber, DateTime startDate, DateTime endDate, decimal pricePerNight, string requestText)
     {
-        Client client = GetClient(clientFirstName, clientLastName);  // Retrieve the client
-        Hotel hotel = GetHotel(hotelName);  // Retrieve the hotel
-        Room room = hotel?.Rooms?.FirstOrDefault(r => r.Number == roomNumber && !r.IsBooked);  // Get the room by number if available
+        Client client = GetClient(clientFirstName, clientLastName);
+        Hotel hotel = GetHotel(hotelName);
+        Room room = hotel?.Rooms?.FirstOrDefault(r => r.Number == roomNumber && !r.IsBooked);
 
         if (client != null && hotel != null && room != null)
         {
             Booking booking = new Booking(client, hotel, room, startDate, endDate, pricePerNight, requestText);
-            bookings.Add(booking);  // Add the booking to the list
+            bookings.Add(booking);
             room.IsBooked = true;
             Console.WriteLine("Booking successfully created.");
         }
