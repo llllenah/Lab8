@@ -5,8 +5,8 @@
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         IHotelManager manager = new HotelManager();
-
         Console.WriteLine("=== Управління готелями ===");
+
         manager.AddHotel("Grand Hotel", "Kyiv", "Main Street", 50);
         manager.AddHotel("Ocean View", "Odesa", "Beach Avenue", 30);
         Console.WriteLine("Список готелів:");
@@ -56,11 +56,19 @@
             Console.WriteLine($"- Кімната {room.Number}");
         }
 
+        Console.WriteLine("\nОбчислення вартості бронювання для Johnny Doe, кімната 1:");
+        decimal cost = manager.GetBookingCost("Johnny", "Doe", "New Grand Hotel", 1);
+        Console.WriteLine($"Загальна вартість: {cost}");
+
+        Console.WriteLine("\nКлієнти з бронюваннями:");
+        foreach (var c in manager.GetClientsWithBookings())
+        {
+            Console.WriteLine($"- {c.FirstName} {c.LastName}");
+        }
+
         Console.WriteLine("\n=== Управління запитами на бронювання ===");
         DateTime now = DateTime.Now;
-
         manager.AddBookingRequest("New Grand Hotel", 3, "Need a quiet room", now, now.AddDays(2));
-
         Console.WriteLine("Список запитів на бронювання (наступні 5 днів):");
         foreach (var req in manager.GetBookingRequests(now, now.AddDays(5)))
         {
@@ -69,7 +77,6 @@
 
         Console.WriteLine("\nОновлення запиту на бронювання для New Grand Hotel, кімната 3...");
         manager.UpdateBookingRequest("New Grand Hotel", 3, "Need a quiet room with extra pillows");
-
         Console.WriteLine("Запити після оновлення:");
         foreach (var req in manager.GetBookingRequests(now, now.AddDays(5)))
         {
@@ -87,16 +94,12 @@
         {
             Console.WriteLine($"- {req.HotelName}, кімната {req.RoomNumber}: {req.RequestText}");
         }
-
         manager.RemoveBookingRequest("New Grand Hotel", 3);
-
-        Console.WriteLine("\nЗапити після видалення:");
+        Console.WriteLine("\nЗапити після видалення (залишився запит для кімнати 4):");
         foreach (var req in manager.GetBookingRequests(now, now.AddDays(5)))
         {
             Console.WriteLine($"- {req.HotelName}, кімната {req.RoomNumber}: {req.RequestText}");
         }
-
-
 
         Console.WriteLine("\n=== Пошук ===");
         Console.WriteLine("Пошук готелів за ключовим словом 'Grand':");

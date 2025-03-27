@@ -1,36 +1,31 @@
 ﻿public class Room
 {
-    /// <summary>
-    /// Номер кімнати.
-    /// </summary>
     public int Number { get; set; }
-    /// <summary>
-    /// Прапорець, що вказує, чи заброньована кімната.
-    /// </summary>
-    public bool IsBooked { get; set; }
+    public string Type { get; set; }
+    public decimal PricePerNight { get; set; }
+    public bool IsAvailable { get; set; }
 
-    /// <summary>
-    /// Конструктор кімнати.
-    /// </summary>
-    public Room(int number)
+    public Room(int number, string type, decimal pricePerNight)
     {
         Number = number;
-        IsBooked = false;
+        Type = type;
+        PricePerNight = pricePerNight;
+        IsAvailable = true;
     }
 
     /// <summary>
-    /// Встановлює статус кімнати як заброньована.
+    /// Позначає кімнату як заброньовану.
     /// </summary>
     public void MarkAsBooked()
     {
-        IsBooked = true;
+        IsAvailable = false;
     }
 
     /// <summary>
-    /// Встановлює статус кімнати як вільна.
+    /// Позначає кімнату як доступну.
     /// </summary>
     public void MarkAsAvailable()
     {
-        IsBooked = false;
+        IsAvailable = true;
     }
 }
