@@ -42,17 +42,11 @@
         return Rooms.Where(r => r.IsAvailable);
     }
 
-    /// <summary>
-    /// Додає запит на бронювання для певного номера.
-    /// </summary>
     public void AddBookingRequest(int roomNumber, string requestText, DateTime startDate, DateTime endDate)
     {
         BookingRequests.Add(new BookingRequest(Name, roomNumber, requestText, startDate, endDate));
     }
 
-    /// <summary>
-    /// Видаляє запит на бронювання для певного номера.
-    /// </summary>
     public void RemoveBookingRequest(int roomNumber)
     {
         var req = BookingRequests.FirstOrDefault(r => r.RoomNumber == roomNumber);
@@ -61,9 +55,6 @@
         BookingRequests.Remove(req);
     }
 
-    /// <summary>
-    /// Оновлює текст запиту на бронювання для певного номера.
-    /// </summary>
     public void UpdateBookingRequest(int roomNumber, string newText)
     {
         var req = BookingRequests.FirstOrDefault(r => r.RoomNumber == roomNumber);

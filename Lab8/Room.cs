@@ -13,17 +13,11 @@
         IsAvailable = true;
     }
 
-    /// <summary>
-    /// Позначає кімнату як заброньовану.
-    /// </summary>
     public void MarkAsBooked()
     {
         IsAvailable = false;
     }
 
-    /// <summary>
-    /// Позначає кімнату як доступну.
-    /// </summary>
     public void MarkAsAvailable()
     {
         IsAvailable = true;

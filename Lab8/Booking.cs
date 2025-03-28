@@ -19,9 +19,6 @@
         RequestText = requestText;
     }
 
-    /// <summary>
-    /// Розраховує загальну вартість бронювання (кількість ночей * ціна за добу).
-    /// </summary>
     public decimal CalculateTotalCost()
     {
         int nights = (EndDate - StartDate).Days;
