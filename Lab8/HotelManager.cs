@@ -1,4 +1,6 @@
-﻿public interface IHotelManager
+﻿using System.Text;
+
+public interface IHotelManager
 {
     /// <summary>
     /// 1.1. Додає новий готель.
@@ -51,14 +53,22 @@
     IEnumerable<Client> GetClients();
 
     /// <summary>
-    /// 2.6. Повертає список клієнтів, відсортованих за іменем.
+    /// 2.6. Повертає список клієнтів, відсортованих за іменем (повертає новий список).
     /// </summary>
     IEnumerable<Client> GetClientsSortedByName();
 
     /// <summary>
-    /// 2.7. Повертає список клієнтів, відсортованих за прізвищем.
+    /// 2.7. Повертає список клієнтів, відсортованих за прізвищем (повертає новий список).
     /// </summary>
     IEnumerable<Client> GetClientsSortedByLastName();
+
+    /// <summary>
+    /// Додатковий метод: повертає детальну інформацію про клієнта.
+    /// </summary>
+    /// <param name="firstName">Ім'я клієнта.</param>
+    /// <param name="lastName">Прізвище клієнта.</param>
+    /// <returns>Рядок з детальною інформацією про клієнта.</returns>
+    string GetDetailedClientInfo(string firstName, string lastName);
 
     /// <summary>
     /// 3.1. Додає бронювання номера для клієнта.
@@ -80,10 +90,6 @@
     /// 3.3. Повертає дані про конкретне бронювання.
     /// </summary>
     Booking GetBooking(string clientFirstName, string clientLastName, string hotelName, int roomNumber);
-    /// <summary>
-    /// 3.4. Повертає дані про всі бронювання.
-    /// </summary>
-    IEnumerable<Booking> GetBookings();
 
     /// <summary>
     /// 3.4. Повертає дані про заброньовані місця в готелі.
@@ -134,6 +140,8 @@
     /// 4.2. Пошук клієнтів за ключовим словом.
     /// </summary>
     IEnumerable<Client> SearchClients(string keyword);
+    IEnumerable<Booking> GetBookings();
+
 }
 
 public class HotelManager : IHotelManager
@@ -143,6 +151,7 @@ public class HotelManager : IHotelManager
     private List<Booking> bookings = new List<Booking>();
     private List<BookingRequest> bookingRequests = new List<BookingRequest>();
 
+    
     public void AddHotel(string name, string city, string street, int totalRooms)
     {
         if (string.IsNullOrWhiteSpace(name) || totalRooms <= 0)
@@ -192,16 +201,47 @@ public class HotelManager : IHotelManager
             throw new ArgumentException("Клієнт не знайдений.");
         client.UpdateName(newFirstName, newLastName);
     }
+
     public Client GetClient(string firstName, string lastName)
         => clients.FirstOrDefault(c => c.FirstName.Equals(firstName, StringComparison.OrdinalIgnoreCase)
                                       && c.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase));
 
     public IEnumerable<Client> GetClients() => clients;
 
-    public IEnumerable<Client> GetClientsSortedByName() => clients.OrderBy(c => c.FirstName);
+    
+    public IEnumerable<Client> GetClientsSortedByName() => clients.OrderBy(c => c.FirstName).ToList();
 
-    public IEnumerable<Client> GetClientsSortedByLastName() => clients.OrderBy(c => c.LastName);
+    
+    public IEnumerable<Client> GetClientsSortedByLastName() => clients.OrderBy(c => c.LastName).ToList();
 
+    
+    public string GetDetailedClientInfo(string firstName, string lastName)
+    {
+        var client = GetClient(firstName, lastName);
+        if (client == null)
+            throw new ArgumentException("Клієнт не знайдений.");
+
+        var clientBookings = bookings
+            .Where(b => b.Client.FirstName.Equals(firstName, StringComparison.OrdinalIgnoreCase)
+                     && b.Client.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        int bookedRoomsCount = clientBookings.Select(b => b.Room.Number).Distinct().Count();
+
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine($"Клієнт: {client.FirstName} {client.LastName}");
+        sb.AppendLine($"Кількість заброньованих кімнат: {bookedRoomsCount}");
+        sb.AppendLine("Бронювання:");
+        foreach (var b in clientBookings)
+        {
+            sb.AppendLine($"- Готель: {b.Hotel.Name}, кімната: {b.Room.Number}, " +
+                          $"Дати: {b.StartDate.ToShortDateString()} - {b.EndDate.ToShortDateString()}, " +
+                          $"Ціна за добу: {b.PricePerNight}, Загальна вартість: {b.CalculateTotalCost()}");
+        }
+        return sb.ToString();
+    }
+
+    
     public void AddBooking(string clientFirstName, string clientLastName, string hotelName, int roomNumber,
                            DateTime startDate, DateTime endDate, decimal pricePerNight, string requestText)
     {
@@ -229,7 +269,6 @@ public class HotelManager : IHotelManager
         booking.Room.MarkAsAvailable();
         bookings.Remove(booking);
     }
-
     public void UpdateBookingRequest(string clientFirstName, string clientLastName, string hotelName, int roomNumber, string newRequestText)
     {
         var booking = GetBooking(clientFirstName, clientLastName, hotelName, roomNumber);
@@ -247,29 +286,38 @@ public class HotelManager : IHotelManager
             b.Room.Number == roomNumber);
     }
 
+    
     public IEnumerable<Booking> GetBookings() => bookings;
 
+    
     public IEnumerable<Booking> GetBookingsByDateRange(DateTime startDate, DateTime endDate)
     {
         return bookings.Where(b => b.StartDate >= startDate && b.EndDate <= endDate);
     }
 
+    
     public IEnumerable<Room> GetBookedRooms(string hotelName)
     {
         Hotel hotel = GetHotel(hotelName);
         if (hotel == null)
             throw new ArgumentException("Готель не знайдений.");
-        return hotel.GetBookedRooms();
+        var booked = hotel.GetBookedRooms();
+        Console.WriteLine($"Кількість заброньованих кімнат: {booked.Count()}");
+        return booked;
     }
 
+    
     public IEnumerable<Room> GetAvailableRooms(string hotelName)
     {
         Hotel hotel = GetHotel(hotelName);
         if (hotel == null)
             throw new ArgumentException("Готель не знайдений.");
-        return hotel.GetAvailableRooms();
+        var available = hotel.GetAvailableRooms();
+        Console.WriteLine($"Кількість доступних кімнат: {available.Count()}");
+        return available;
     }
 
+    
     public decimal GetBookingCost(string clientFirstName, string clientLastName, string hotelName, int roomNumber)
     {
         var booking = GetBooking(clientFirstName, clientLastName, hotelName, roomNumber);
@@ -278,22 +326,23 @@ public class HotelManager : IHotelManager
         return booking.CalculateTotalCost();
     }
 
+    
     public IEnumerable<Client> GetClientsWithBookings()
     {
         return bookings.Select(b => b.Client).Distinct();
     }
 
+    
     public void AddBookingRequest(string hotelName, int roomNumber, string requestText, DateTime startDate, DateTime endDate)
     {
         Hotel hotel = GetHotel(hotelName);
         if (hotel == null)
             throw new ArgumentException("Готель не знайдений.");
-        // Делегуємо додавання запиту класу Hotel
         hotel.AddBookingRequest(roomNumber, requestText, startDate, endDate);
-        // Також зберігаємо запит в глобальну колекцію
         bookingRequests.Add(new BookingRequest(hotelName, roomNumber, requestText, startDate, endDate));
     }
 
+    
     public void RemoveBookingRequest(string hotelName, int roomNumber)
     {
         Hotel hotel = GetHotel(hotelName);
@@ -308,6 +357,7 @@ public class HotelManager : IHotelManager
         bookingRequests.Remove(req);
     }
 
+    
     public void UpdateBookingRequest(string hotelName, int roomNumber, string newText)
     {
         Hotel hotel = GetHotel(hotelName);
@@ -322,19 +372,23 @@ public class HotelManager : IHotelManager
         req.UpdateRequestText(newText);
     }
 
+    
     public IEnumerable<BookingRequest> GetBookingRequests(DateTime startDate, DateTime endDate)
     {
         return bookingRequests.Where(r => r.StartDate >= startDate && r.EndDate <= endDate);
     }
 
+    
     public IEnumerable<Hotel> SearchHotels(string keyword)
     {
         return hotels.Where(h => h.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase));
     }
 
+    
     public IEnumerable<Client> SearchClients(string keyword)
     {
         return clients.Where(c => c.FirstName.Contains(keyword, StringComparison.OrdinalIgnoreCase)
                                 || c.LastName.Contains(keyword, StringComparison.OrdinalIgnoreCase));
     }
+
 }

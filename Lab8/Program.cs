@@ -1,12 +1,15 @@
 ﻿public class Program
 {
+    /// <summary>
+    /// Головний метод демонстрації.
+    /// </summary>
     public static void Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         IHotelManager manager = new HotelManager();
-        Console.WriteLine("=== Управління готелями ===");
 
+        Console.WriteLine("=== Управління готелями ===");
         manager.AddHotel("Grand Hotel", "Kyiv", "Main Street", 50);
         manager.AddHotel("Ocean View", "Odesa", "Beach Avenue", 30);
         Console.WriteLine("Список готелів:");
@@ -23,20 +26,45 @@
         Console.WriteLine("\n=== Управління клієнтами ===");
         manager.AddClient("John", "Doe");
         manager.AddClient("Alice", "Smith");
+        manager.AddClient("Test", "Test");
         Console.WriteLine("Список клієнтів:");
         foreach (var client in manager.GetClients())
         {
             Console.WriteLine($"- {client.FirstName} {client.LastName}");
         }
+
+        Console.WriteLine("\nКлієнти, відсортовані за ім'ям:");
+        foreach (var client in manager.GetClientsSortedByName())
+        {
+            Console.WriteLine($"- {client.FirstName} {client.LastName}");
+        }
+        Console.WriteLine("\nСписок");
+        foreach (var client in manager.GetClients())
+        {
+            Console.WriteLine($"- {client.FirstName} {client.LastName}");
+        }
+
+        Console.WriteLine("\nКлієнти, відсортовані за прізвищем:");
+        foreach (var client in manager.GetClientsSortedByLastName())
+        {
+            Console.WriteLine($"- {client.FirstName} {client.LastName}");
+        }
+
+
         Console.WriteLine("\nОновлення клієнта 'John Doe'...");
         manager.UpdateClient("John", "Doe", "Johnny", "Doe");
         var updatedClient = manager.GetClient("Johnny", "Doe");
         Console.WriteLine($"Оновлений клієнт: {updatedClient.FirstName} {updatedClient.LastName}");
 
+
         Console.WriteLine("\n=== Управління бронюваннями ===");
         manager.AddBooking("Johnny", "Doe", "New Grand Hotel", 1, DateTime.Now, DateTime.Now.AddDays(3), 100, "Late check-in");
         manager.AddClient("Bob", "Brown");
         manager.AddBooking("Bob", "Brown", "New Grand Hotel", 2, DateTime.Now.AddDays(1), DateTime.Now.AddDays(4), 90, "Window room");
+
+        Console.WriteLine("\nДетальна інформація про клієнта (Johnny Doe):");
+        string detailedInfo = manager.GetDetailedClientInfo("Johnny", "Doe");
+        Console.WriteLine(detailedInfo);
 
         Console.WriteLine("Список бронювань:");
         foreach (var booking in manager.GetBookings())
@@ -46,12 +74,15 @@
         }
 
         Console.WriteLine("\nЗаброньовані кімнати у готелі New Grand Hotel:");
-        foreach (var room in manager.GetBookedRooms("New Grand Hotel"))
+        var bookedRooms = manager.GetBookedRooms("New Grand Hotel");
+        foreach (var room in bookedRooms)
         {
             Console.WriteLine($"- Кімната {room.Number}");
         }
-        Console.WriteLine("\nВільні кімнати у готелі New Grand Hotel:");
-        foreach (var room in manager.GetAvailableRooms("New Grand Hotel"))
+
+        Console.WriteLine("\nДоступні кімнати у готелі New Grand Hotel:");
+        var availableRooms = manager.GetAvailableRooms("New Grand Hotel");
+        foreach (var room in availableRooms)
         {
             Console.WriteLine($"- Кімната {room.Number}");
         }
@@ -85,10 +116,8 @@
 
         Console.WriteLine("\nВидалення запиту на бронювання для New Grand Hotel, кімната 3...");
         manager.RemoveBookingRequest("New Grand Hotel", 3);
-
         manager.AddBookingRequest("New Grand Hotel", 3, "Запит для кімнати 3", now, now.AddDays(2));
         manager.AddBookingRequest("New Grand Hotel", 4, "Запит для кімнати 4", now, now.AddDays(2));
-
         Console.WriteLine("Запити до видалення:");
         foreach (var req in manager.GetBookingRequests(now, now.AddDays(5)))
         {
